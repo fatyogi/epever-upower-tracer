@@ -79,7 +79,7 @@ By default these scripts write the output into the console (as well as the datab
 Grafana Dashboard
 --------------------
 ![Img](grafana/screenshot.png)
-The [grafana/](grafana/) folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
+The [grafana/](grafana/) folder contains the dashboard to monitor realtime and historical solar charging data.
 
 ## Grafana/InfluxDB installation
 
@@ -90,8 +90,16 @@ The [grafana/](grafana/) folder contains everything needed to setup a dashboard 
 
 `apt install influxdb python-influxdb influxdb-client grafana`
 
-Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
-You can import SolarDashboard from [grafana/] folder.
+* Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
+* Add InfluxDB as a Data Source. Influx DB should be set up with the following parameters:
+
+- ifuser = "grafana"
+- ifpass = "solar"
+- ifdb   = "solar"
+- ifhost = "127.0.0.1"
+- ifport = 8086
+
+* You can import SolarDashboard from [grafana/](grafana/) folder.
 
 Additional scripts
 ------------------
