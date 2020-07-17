@@ -70,11 +70,11 @@ By default these scripts write the output into the console (as well as the datab
 
 3. add the line to log the values every minute (this is for the Tracer model):
 
-`* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null`
+`* * * * *  cd /home/pi/epever-upower-tracer && python logtracer.py > /dev/null`
 
 4. you can add another line if you want it every half a minute:
 
-`* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null`
+`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
 
 Grafana Dashboard
 --------------------
