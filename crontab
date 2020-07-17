@@ -1,0 +1,8 @@
+# Get info from Tracer
+* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null
+#* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null
+
+# UPower - switch the invertor on and off for the night/day
+# invertor off
+#30 0 * * *	sleep 30 && cd /home/pi/solartracer && ./ivctl.py -i off
+#15 7 * * *	sleep 30 && cd /home/pi/solartracer && ./ivctl.py -i on
