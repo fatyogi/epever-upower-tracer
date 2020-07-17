@@ -1,15 +1,20 @@
-# epsolar-tracer
-Tools for Connecting Tracer BN Solar Charger to Raspberry Pi with Python via rs485
+Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via RS-485
 ===================================================
 
-This is how I setup a  Raspberry Pi with  a RS485 adapter to track statistics from a Tracer 4215BN Solar Charger. This should work with any of the tracer BN series charge controllers.
+**EPSolar Tracer** AN/BN device have been around for a while so this is just another attempt to establish a good monitoring package.
 
-The first generation controller used RS-232 and a different protocol. see https://github.com/xxv/tracer. This could be adapted to work with that.
+**EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
+Look into [Epsolar Docs](epsolar-docs/) to find the details.
 
-Linux driver for Exar USB UART
-------------------------------
-Heres how to install the driver for a usb to rs-485 similar to the one [found here](https://www.amazon.com/gp/product/B016RU8JUY/ref=oh_aui_search_detailpage?ie=UTF8&psc=1)
+## Requirements
+- Python 2.7 (standard Python coming with Raspberry Pi of the latest versions of Raspbian)
+- Influx DB and Python modules
+- Grafana
+- [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
+
+Make sure you install the Linux driver for Exar USB UART first
+--------------------------------------------------------------
 The [xr_usb_serial_common](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS on a raspberry pi 3. Before compiling be sure to install the linux headers with
 `sudo apt-get install raspberrypi-kernel-headers`
 
@@ -35,59 +40,40 @@ If all goes well you should see `ttyXRUSB` when listing `ls /dev/tty*`
 
 Reboot and enjoy!
 
-Protocol
---------
+Tracer AN/BN Protocol
+---------------------
 [Protocol](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf)
 
-Python module
--------------
-A simple script found in [dashing/jobs](dashing/jobs/getRegistery.py) will read a specific register from the solar charger. You can use this to test that your driver is working. Before running be sure to install the [Minimal Modbus](https://github.com/pyhys/minimalmodbus) python library.
-Run the script like so:
-`python getRegister.py 0x3100`
-The script will return 0 if there is any kind of error.
+Python modules
+--------------
+`SolarTracer.py` is the module to communicate with Tracer AN/BN controller
+`UPower.py` is for communication with UPower inverters
 
-The file `logsolar.py` will query the solar controller for relevant data and log it to a mysql database. You will need to update the file to point to your mysql db.
-Uses [Minimal Modbus](https://github.com/pyhys/minimalmodbus) and mysqldb libraries
+Logging scripts
+--------------
+The file `logtracer.py` will query the Tracer AN/BN controller for relevant data and store into Influx DB.
+The file `logupower.py` will query the UPower inverter for relevant data and store into Influx DB.
 
-Setting up a cron job to run this script regularly is advisable if you intend to setup a dashboard.
-To set up a cron job:
-First make `logsolar.py` and executable file:
-`sudo chmod +x logsolar.py`
+## Setting up a cron job to run this script regularly:
 
-Now add the cron job:
+1. First make `logupower.py` an executable:
+`sudo chmod +x log*.py`
+
+2. Now add the cron job:
 `crontab -e`
-`*/5 * * * * /PATHTOREPO/logsolar.py`
+add the line:
+`* * * * * /home/pi/logupower.py`
 
-Dashing.io Dashboard
+Grafana Dashboard
 --------------------
-![Img](img/IMG_2011.png)
-The Dashing folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data. Install dashing and created a new project, then copy the files from the dashing folder into your new dashing project. The path to the phython script in /jobs/ will need to be changed.
+![Img](grafana/screenshot.png)
+The **grafana** folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
 
-Starting Raspberry Pi as a Local Network + Web Service
-------------------------------------------------------
+Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 
-Do the first part of this tutorial. Dont worry about network bridging unless you are doing this for your house and want the raspberry to be connected to the net.
-https://www.raspberrypi.org/documentation/configuration/wireless/access-point.md
+Additional scripts
+------------------
+`setTracerVoltages.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries
+Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries
 
-Comment out any "NETWORK={" entries in /etc/wpa_supplicant/wpa_supplicant.conf
-Be sure to hard reboot after running. A soft reboot does not start up the lotal network. From a [tip here](https://www.raspberrypi.org/forums/viewtopic.php?t=208664)
-
-Next we need to setup port forwarding to forward port 80 to the port Dashing runs on. Usually 3030
-Add these lines at the end o f `/etc/rc.local`
-```
-# Forward port 80 to 3030 (where our web server is) so the
-# web server can run at normal permissions
-iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 3030
-```
-
-Follow this to start Dashing on Boot. This works with ruby 2.3+
-https://gist.github.com/gregology/5313326
-
-If you want to change your hostname, or the address you will put into a web browser, follow this.
-https://www.howtogeek.com/167195/how-to-change-your-raspberry-pi-or-other-linux-devices-hostname/
-
-Now you should be able to connect to your raspberry pi, open a web browser and enter `hostname.local` to open your dashboard!
-
-Cheers!
-
-
+`ivctl.py` may be used to switch the inverter off/on for the night
