@@ -90,7 +90,8 @@ You can import SolarDashboard from [grafana/] folder.
 
 Additional scripts
 ------------------
-`setTracerVoltages.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries
-Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries
+`setTracerVoltages.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
+
+Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acide flooded battery in the script. See the comments on how to choose it.
 
 `ivctl.py` may be used to switch the inverter off/on for the night
