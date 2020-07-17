@@ -9,9 +9,9 @@ Look into [epsolar-docs/](epsolar-docs/) to find the details.
 
 ## Requirements
 - Python 2.7 (standard Python coming with Raspberry Pi of the latest versions of Raspbian)
-- Influx DB and Python modules
-- Grafana
-- [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
+- Influx DB and its Python 2.7 modules
+- Grafana - latest, whatever is availabe in your Raspbian
+- To communicate with the devices you will need [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
 
 Make sure you install the Linux driver for Exar USB UART first
 --------------------------------------------------------------
