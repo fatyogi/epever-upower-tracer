@@ -46,6 +46,9 @@ Tracer AN/BN Protocol
 
 Python modules
 --------------
+Install minimalmodbus first:
+`pip install minimalmodbus`
+
 `SolarTracer.py` is the module to communicate with Tracer AN/BN controller
 `UPower.py` is for communication with UPower inverters
 
@@ -71,9 +74,18 @@ you can add another line if you want it every half a minute:
 Grafana Dashboard
 --------------------
 ![Img](grafana/screenshot.png)
-The **grafana** folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
+The [grafana/] folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
+
+## Grafana/InfluxDB installation
+
+### become a superuser
+`sudo -i`
+### update and install the packages
+apt update && apt upgrade
+apt install influxdb python-influxdb influxdb-client grafana
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
+You can import SolarDashboard from [grafana/] folder.
 
 Additional scripts
 ------------------
