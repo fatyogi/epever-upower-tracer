@@ -61,14 +61,14 @@ By default these scripts write the output into the console (as well as the datab
 
 ## Setting up a cron job to run this script regularly:
 
-1. First make `logupower.py` an executable:
+1. First make `logupower.py` and `logtracer.py` executable:
 `sudo chmod +x log*.py`
 
 3. Now add the cron job:
 
 `crontab -e`
 
-3. add the line to log the values every minute:
+3. add the line to log the values every minute (this is for the Tracer model):
 
 `* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null`
 
@@ -110,6 +110,6 @@ Additional scripts
 ------------------
 `setTracerVoltages.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
 
-Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acide flooded battery in the script. See the comments on how to choose it.
+Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
 
 `ivctl.py` may be used to switch the inverter off/on for the night
