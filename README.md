@@ -5,8 +5,6 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 **EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
-Look into [epsolar-docs/](epsolar-docs/) to find the details.
-
 ## Requirements
 - Python 2.7 (standard Python coming with Raspberry Pi of the latest versions of Raspbian)
 - Influx DB and its Python 2.7 modules
@@ -40,9 +38,10 @@ If all goes well you should see `ttyXRUSB` when listing `ls /dev/tty*`
 
 Reboot and enjoy!
 
-Tracer AN/BN Protocol
+Device communications protocols
 ---------------------
 [Protocol for Epsolar Tracer](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf) on the Czech solar company website
+[Protocol for UPower inverters](epsolars-docs/Upower-communication-protocol-20190411.xlsx) in this repository
 
 Python modules
 --------------
@@ -111,5 +110,8 @@ Additional scripts
 `setTracerVoltages.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
 
 Current settings are for 24V LiFePO4, however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
+
+See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository
+
 
 `ivctl.py` may be used to switch the inverter off/on for the night
