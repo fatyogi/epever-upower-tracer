@@ -1,7 +1,7 @@
 Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via RS-485
 ===================================================
 
-**EPSolar Tracer** AN/BN device have been around for a while so this is just another attempt to establish a good monitoring package.
+**EPSolar Tracer** AN/BN devices have been around for a while so this is just another attempt to establish a good monitoring package.
 
 **EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
@@ -42,7 +42,7 @@ Reboot and enjoy!
 
 Tracer AN/BN Protocol
 ---------------------
-[Protocol](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf)
+[Protocol for Epsolar Tracer](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf) on the Czech solar company website
 
 Python modules
 --------------
@@ -54,6 +54,8 @@ Logging scripts
 The file `logtracer.py` will query the Tracer AN/BN controller for relevant data and store into Influx DB.
 The file `logupower.py` will query the UPower inverter for relevant data and store into Influx DB.
 
+By default these scripts write the output into the console (as well as the database). Use > /dev/null to make them "silent".
+
 ## Setting up a cron job to run this script regularly:
 
 1. First make `logupower.py` an executable:
@@ -61,8 +63,10 @@ The file `logupower.py` will query the UPower inverter for relevant data and sto
 
 2. Now add the cron job:
 `crontab -e`
-add the line:
-`* * * * * /home/pi/logupower.py`
+add the line to log the values every minute:
+`* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null`
+you can add another line if you want it every half a minute:
+`* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null`
 
 Grafana Dashboard
 --------------------
