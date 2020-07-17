@@ -81,8 +81,9 @@ The [grafana/](grafana/) folder contains everything needed to setup a dashboard 
 ### become a superuser
 `sudo -i`
 ### update and install the packages
-`apt update && apt upgrade
-apt install influxdb python-influxdb influxdb-client grafana`
+`apt update && apt upgrade`
+
+`apt install influxdb python-influxdb influxdb-client grafana`
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 You can import SolarDashboard from [grafana/] folder.
