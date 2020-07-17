@@ -64,15 +64,15 @@ By default these scripts write the output into the console (as well as the datab
 1. First make `logupower.py` an executable:
 `sudo chmod +x log*.py`
 
-1. Now add the cron job:
+3. Now add the cron job:
 
 `crontab -e`
 
-1. add the line to log the values every minute:
+3. add the line to log the values every minute:
 
 `* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null`
 
-1. you can add another line if you want it every half a minute:
+4. you can add another line if you want it every half a minute:
 
 `* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null`
 
