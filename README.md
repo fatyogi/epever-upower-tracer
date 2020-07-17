@@ -66,9 +66,11 @@ By default these scripts write the output into the console (as well as the datab
 
 2. Now add the cron job:
 `crontab -e`
+
 add the line to log the values every minute:
 `* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null`
-you can add another line if you want it every half a minute:
+
+3. you can add another line if you want it every half a minute:
 `* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null`
 
 Grafana Dashboard
