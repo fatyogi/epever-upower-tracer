@@ -74,15 +74,15 @@ you can add another line if you want it every half a minute:
 Grafana Dashboard
 --------------------
 ![Img](grafana/screenshot.png)
-The [grafana/] folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
+The [grafana/](grafana/) folder contains everything needed to setup a dashboard to monitor realtime and historical solar charging data.
 
 ## Grafana/InfluxDB installation
 
 ### become a superuser
 `sudo -i`
 ### update and install the packages
-apt update && apt upgrade
-apt install influxdb python-influxdb influxdb-client grafana
+`apt update && apt upgrade
+apt install influxdb python-influxdb influxdb-client grafana`
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 You can import SolarDashboard from [grafana/] folder.
