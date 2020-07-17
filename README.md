@@ -5,7 +5,7 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 **EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
-Look into [Epsolar Docs](epsolar-docs/) to find the details.
+Look into [epsolar-docs/](epsolar-docs/) to find the details.
 
 ## Requirements
 - Python 2.7 (standard Python coming with Raspberry Pi of the latest versions of Raspbian)
