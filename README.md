@@ -40,8 +40,9 @@ Reboot and enjoy!
 
 Device communications protocols
 ---------------------
-[Protocol for Epsolar Tracer](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf) on the Czech solar company website
-[Protocol for UPower inverters](epsolars-docs/Upower-communication-protocol-20190411.xlsx) in this repository
+* [Protocol for Epsolar Tracer](http://www.solar-elektro.cz/data/dokumenty/1733_modbus_protocol.pdf) on the Czech solar company website
+
+* [Protocol for UPower inverters](epsolars-docs/Upower-communication-protocol-20190411.xlsx) in this repository
 
 Python modules
 --------------
