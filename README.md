@@ -106,6 +106,15 @@ The [grafana/](grafana/) folder contains the dashboard to monitor realtime and h
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 
+### Set up an InfluxDB database
+`influx
+  Connected to http://localhost:8086 version 1.6.4
+  InfluxDB shell version: 1.6.4
+
+CREATE DATABASE solar
+USE solar
+`
+
 Add InfluxDB as a Data Source. Influx DB should be set up with the following parameters:
 
 - user = "grafana"
