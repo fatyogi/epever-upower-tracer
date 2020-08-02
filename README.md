@@ -87,9 +87,11 @@ The [grafana/](grafana/) folder contains the dashboard to monitor realtime and h
 
 ### become a superuser
 `sudo -i`
+### add Grafana repo
+`wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -`
+`echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list`
 ### update and install the packages
 `apt update && apt upgrade`
-
 `apt install influxdb python-influxdb influxdb-client grafana`
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
