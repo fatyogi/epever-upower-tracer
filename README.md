@@ -85,37 +85,11 @@ The [grafana/](grafana/) folder contains the dashboard to monitor realtime and h
 
 ## Grafana/InfluxDB installation
 
-### become a superuser
-`sudo -i`
-### add Grafana repo
-`wget -q -O - https://packages.grafana.com/gpg.key | sudo apt-key add -`
-
-`echo "deb https://packages.grafana.com/oss/deb stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list`
-### update and install the packages
-`apt update && apt upgrade`
-
-`apt install influxdb python-influxdb influxdb-client grafana`
-
-### Enable the Grafana server:
-
-`sudo /bin/systemctl enable grafana-server`
-
-### Start the Grafana server:
-
-`sudo /bin/systemctl start grafana-server`
+Use [this guide](https://simonhearne.com/2020/pi-influx-grafana/) to install InfluxDB and Grafana on Raspberry Pi
 
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 
-### Set up an InfluxDB database
-`influx
-  Connected to http://localhost:8086 version 1.6.4
-  InfluxDB shell version: 1.6.4
-
-CREATE DATABASE solar
-USE solar
-`
-
-Add InfluxDB as a Data Source. Influx DB should be set up with the following parameters:
+When you add InfluxDB as a Data Source. Influx DB should be set up with the following parameters:
 
 - user = "grafana"
 - pass = "solar"
