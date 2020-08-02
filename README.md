@@ -96,6 +96,14 @@ The [grafana/](grafana/) folder contains the dashboard to monitor realtime and h
 
 `apt install influxdb python-influxdb influxdb-client grafana`
 
+### Enable the Grafana server:
+
+`sudo /bin/systemctl enable grafana-server`
+
+### Start the Grafana server:
+
+`sudo /bin/systemctl start grafana-server`
+
 Run http://raspberrypi.local:3000 (or whatever your name for the Raspberry Pi is) to configure the Grafana console
 
 Add InfluxDB as a Data Source. Influx DB should be set up with the following parameters:
