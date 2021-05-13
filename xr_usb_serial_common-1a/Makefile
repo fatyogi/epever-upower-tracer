@@ -13,3 +13,9 @@ modules_install:
 
 clean:
 	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions vtty
+
+install: all
+	sudo cp blacklist-cdc-acm.conf /etc/modprobe.d/
+	sudo cp xr_usb_serial_common.ko /lib/modules/`uname -r`/kernel/drivers/tty/serial
+	sudo depmod -ae
+	sudo update-initramfs -u
