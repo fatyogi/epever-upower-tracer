@@ -21,7 +21,9 @@ The resulting `xr_usb_serial_common.ko` file will need to be moved to `/lib/modu
 After building and moving the module, remove the cdc-acm driver that automatically installs for the usb-485 adapter.
 
 `rmmod cdc-acm`
+
 `modprobe -r usbserial`
+
 `modprobe usbserial`
 
 You will also need to add the cdc-acm to the system blacklist:
