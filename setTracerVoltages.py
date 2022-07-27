@@ -16,7 +16,7 @@ flooded = [32.00,30.00,30.00,29.60,29.60,27.60,26.40,25.20,24.40,24.40,22.20,21.
 
 up = SolarTracer()
 if (up.connect() < 0):
-	print "Could not connect to the device"
+	print("Could not connect to the device")
 	exit -2
 
 # get timestamps
@@ -25,10 +25,10 @@ timestamp = time.strftime("%H:%M:%S", localtime)
 timestamp = datetime.datetime.utcnow()
 
 # form a data record
-print "UTC timestamp:", timestamp
-print "BatteryType (0=USER):", up.readParam(BatteryType,0)
-print "BatteryCapacity, Ah :", up.readParam(BatteryCapacity,0)
-print
+print("UTC timestamp:", timestamp)
+print("BatteryType (0=USER):", up.readParam(BatteryType,0))
+print("BatteryCapacity, Ah :", up.readParam(BatteryCapacity,0))
+print()
 
 idx = 0
 for param in voltageNames:
@@ -37,13 +37,12 @@ for param in voltageNames:
     # This will set voltages to LiFePO4, 8s, 24V battery
     newVolt = lifepo[idx]
 
-    print '{:<23}'.format(param), ":", currentVolt,
+    print('{:<23}'.format(param), ":", currentVolt, end=' ')
     
     if (newVolt != currentVolt):
-        print "->", newVolt, "...",
-        if (up.writeParam(voltageRegStart+idx, newVolt) < 0): print "FAILED!"
-        else: print "OK"
+        print("->", newVolt, "...", end=' ')
+        if (up.writeParam(voltageRegStart+idx, newVolt) < 0): print("FAILED!")
+        else: print("OK")
         break
-    else: print
+    else: print()
     idx = idx + 1
-

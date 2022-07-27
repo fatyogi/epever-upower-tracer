@@ -108,129 +108,130 @@ SWreset = 0x010A
 ########
 
 class UPower:
-	"""A member of UPower communication class."""
+    """A member of UPower communication class."""
 
-	# connect to device
-	def __init__(self, device = '/dev/ttyXRUSB0', serialid = 10):
-		self.device = device
-		self.id = serialid
-		self.instrument = 0
-
-
-	def connect(self):
-	    try:
-	            self.instrument = minimalmodbus.Instrument(self.device, self.id)
-	    except minimalmodbus.serial.SerialException:
-	            return -1
-
-	    self.instrument.serial.baudrate = 115200
-	    self.instrument.serial.bytesize = 8
-	    self.instrument.serial.parity   = minimalmodbus.serial.PARITY_NONE
-	    self.instrument.serial.stopbits = 1
-	    self.instrument.serial.timeout  = 1.2
-	    self.instrument.mode = minimalmodbus.MODE_RTU
-	    return 0
-
-	# read informational register
-	def readReg(self,register):
-	    try:
-	            reading = self.instrument.read_register(register, 2, 4)
-	            return reading
-	    except IOError:
-	            return -2
-
-	# read parameter
-	def readParam(self,register,decimals=2):
-	    try:
-	            reading = self.instrument.read_register(register, decimals, 3)
-	            return reading
-	    except IOError:
-	            return -2
-
-	# write parameter
-	def writeParam(self,register,value):
-	    try:
-	            reading = self.instrument.write_register(register, value, 2)
-	            return 0
-	    except IOError:
-	            return -2
-
-	### methods for obtaining parameters
-	def getBatteryType(self):
-		batttype = self.readParam(UP_BatteryType)
-		if (batttype < 0): return -1
-		return UP_BatteryTypes[int(batttype)]
-
-	def setBatteryType(self, newBattType = "LiFePO4"):
-		"""Valid battery types: User, Sealed, GEL, Flooded, LiFePO4, MnNiCo"""
-		try:
-			battno = UP_BatteryTypes.index(newBattType)
-		except ValueError:
-			return -1
-		if (self.writeParam(UP_BatteryType, int(battno)) < 0):	return -2
-		return battno
-
-	def getBatteryCapacity(self):
-		value = self.readParam(UP_BatteryCapacity)
-		if (value < 0): return -1
-		return int(value*100)
-
-	def setBatteryCapacity(self, newCapacity = 100):
-		"""Battery capacity in Ah"""
-		if (self.writeParam(UP_BatteryCapacity, int(newCapacity/100)) < 0):	return -2
-		return newCapacity
-
-	# charge priority modes
-	def getChargePriority(self):
-		pri = self.readParam(UP_ChargePriority)
-		if (pri < 0) : return pri
-		return PriorityModes[int(pri)]
-
-	def setChargePriority(self, newPri = "Solar Priority"):
-		try:
-			prinum = PriorityModes.index(newPri)
-		except ValueError:
-			return -1
-                
-                priValue = float(prinum)
-		#if (self.writeParam(UP_ChargePriority, prinum) < 0): return -2
-		return priValue
-
-        # UPower switches
-        def switchIV(self, onoff):
-            ''"Inverter On/Off"""
-            try:
-                    self.instrument.write_bit(SWiv, onoff)
-                    return onoff
-            except IOError:
-                    return -2
+    # connect to device
+    def __init__(self, device = '/dev/ttyXRUSB0', serialid = 10):
+        self.device = device
+        self.id = serialid
+        self.instrument = 0
 
 
-        def getIV(self):
-            try:
-                    reading = self.instrument.read_bits(SWiv, 1, 1)
-                    return reading[0]
-            except IOError:
-                    return -2
+    def connect(self):
+        try:
+                self.instrument = minimalmodbus.Instrument(self.device, self.id)
+        except minimalmodbus.serial.SerialException:
+                return -1
 
-        def switchAC(self, onoff):
-            try:
-                    self.instrument.write_bit(SWac, onoff)
-                    return onoff
-            except IOError:
-                    return -2
+        self.instrument.serial.baudrate = 115200
+        self.instrument.serial.bytesize = 8
+        self.instrument.serial.parity   = minimalmodbus.serial.PARITY_NONE
+        self.instrument.serial.stopbits = 1
+        self.instrument.serial.timeout  = 1.2
+        self.instrument.mode = minimalmodbus.MODE_RTU
+        return 0
 
-        def getAC(self):
-            try:
-                    reading = self.instrument.read_bits(SWac, 1, 1)
-                    return reading[0]
-            except IOError:
-                    return -2
-
-
-        def reset(self):
-            try:
-                self.instrument.write_bit(SWreset,1)
-            except IOError:
+    # read informational register
+    def readReg(self,register):
+        try:
+                reading = self.instrument.read_register(register, 2, 4)
+                return reading
+        except IOError:
                 return -2
-            return 1
+
+    # read parameter
+    def readParam(self,register,decimals=2):
+        try:
+                reading = self.instrument.read_register(register, decimals, 3)
+                return reading
+        except IOError:
+                return -2
+
+    # write parameter
+    def writeParam(self,register,value):
+        try:
+                reading = self.instrument.write_register(register, value, 2)
+                return 0
+        except IOError:
+                return -2
+
+    ### methods for obtaining parameters
+    def getBatteryType(self):
+        batttype = self.readParam(UP_BatteryType)
+        if (batttype < 0): return -1
+        return UP_BatteryTypes[int(batttype)]
+
+    def setBatteryType(self, newBattType = "LiFePO4"):
+        """Valid battery types: User, Sealed, GEL, Flooded, LiFePO4, MnNiCo"""
+        try:
+            battno = UP_BatteryTypes.index(newBattType)
+        except ValueError:
+            return -1
+        if (self.writeParam(UP_BatteryType, int(battno)) < 0):	return -2
+        return battno
+
+    def getBatteryCapacity(self):
+        value = self.readParam(UP_BatteryCapacity)
+        if (value < 0): return -1
+        return int(value*100)
+
+    def setBatteryCapacity(self, newCapacity = 100):
+        """Battery capacity in Ah"""
+        if (self.writeParam(UP_BatteryCapacity, int(newCapacity/100)) < 0):	return -2
+        return newCapacity
+
+    # charge priority modes
+    def getChargePriority(self):
+        pri = self.readParam(UP_ChargePriority)
+        if (pri < 0) : return pri
+        return PriorityModes[int(pri)]
+
+    def setChargePriority(self, newPri = "Solar Priority"):
+        try:
+            prinum = PriorityModes.index(newPri)
+        except ValueError:
+            return -1
+                
+            priValue = float(prinum)
+        #if (self.writeParam(UP_ChargePriority, prinum) < 0): return -2
+        return priValue
+
+    # UPower switches
+    def switchIV(self, onoff):
+        ''"Inverter On/Off"""
+        try:
+                self.instrument.write_bit(SWiv, onoff)
+                return onoff
+        except IOError:
+                return -2
+
+
+    def getIV(self):
+        try:
+                reading = self.instrument.read_bits(SWiv, 1, 1)
+                return reading[0]
+        except IOError:
+                return -2
+
+    def switchAC(self, onoff):
+        try:
+                self.instrument.write_bit(SWac, onoff)
+                return onoff
+        except IOError:
+                return -2
+
+    def getAC(self):
+        try:
+                reading = self.instrument.read_bits(SWac, 1, 1)
+                return reading[0]
+        except IOError:
+                return -2
+
+
+    def reset(self):
+        try:
+            self.instrument.write_bit(SWreset,1)
+        except IOError:
+            return -2
+        return 1
+

@@ -17,7 +17,7 @@ measurement_name = "solar"
 
 up = SolarTracer()
 if (up.connect() < 0):
-	print "Could not connect to the device"
+	print("Could not connect to the device")
 	exit -2
 
 # get timestamps
@@ -54,7 +54,7 @@ body_solar = [
     }
 ]
 
-print body_solar
+print(body_solar)
 
 # connect to influx
 ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb)
