@@ -48,6 +48,71 @@ UnderVoltageRecover=0x900B
 UnderVoltageWarning=0x900C
 LowVoltageDisconnect=0x900D
 DischargingLimitVoltage=0x900E
+# Load settings
+LoadControlMode=0x903D
+LoadControlModes = ["Manual Control", "Light ON/OFF", "Light ON+ Timer", "Time Control"]
+LoadManualStatus = 0x906A
+
+settingsRegBlockStart = 36864
+settingsRegBlockLength = 15
+tracerSettingsNames = ["BatteryType", 
+                "BatteryCapacity",
+                "TempCompensationCoefficient", 
+                "HighVoltageDisconnect", 
+                "ChargingLimitVoltage", 
+                "OverVoltageReconnect",
+                "EqualizationVoltage",
+                "BoostVoltage",
+                "FloatVoltage",
+                "BoostReconnectVoltage",
+                "LowVoltageReconnect",
+                "UnderVoltageReconnect",
+                "UnderVoltageWarning",
+                "LowVoltageDisconnect",
+                "DischargingLimitVoltage"]
+
+tracerBatteryType = ["USER","SEALED","GEL","FLOODED"]
+
+##### Battery settings for a type (12V)
+##### Source: Victron Energy Manual
+##### Use setBatterySettings(batteryLiFePO4, 300) to set a 12V LiFePO4 battery of 300 Ah capacity
+##### Use setBatterySettings(batteryLiFePO4, 500, 48) to set a 24V LiFePO4 battery of 500 Ah capacity
+
+batteryLeadAcid = [
+    0x0,  # (0x9000 = 0000H - User defined)
+    300, # (0x9001 = 300AH - Battery Capacity)
+    300, # (0x9002 = 3.00mV/C/2V - Temperature compensationcoefficient)
+    1620, # (0x9003 = 16.20V - High Volt.disconnect)
+    1500, # (0x9004 = 15.00V - Charging limit voltage)
+    1500, # (0x9005 = 15.00V - Over voltage reconnect)
+    1460, # (0x9006 = 14.60V - Equalization voltage)
+    1440, # (0x9007 = 14.40V - Boost voltage)
+    1380, # (0x9008 = 13.80V - Float voltage)
+    1630, # (0x9009 = 16.30V - Boost reconnect voltage)
+    1260, # (0x900A = 12.60V - Low voltage reconnect)
+    1220, # (0x900B = 12.20V - Under voltage recover)
+    1200, # (0x900C = 12.00V - Under voltage warning)
+    1110, # (0x900D = 11.10V - Low voltage disconnect)
+    1060, # (0x900E = 10.60V - Discharging limit voltage)
+]
+
+batteryLiFePO4 = [
+    0x0,  # (0x9000 = 0000H - User defined)
+    300, # (0x9001 = 300AH - Battery Capacity)
+    300, # (0x9002 = 3.00mV/C/2V - Temperature compensationcoefficient)
+    1500, # (0x9003 = 15.00V - High Volt.disconnect)
+    1460, # (0x9004 = 14.60V - Charging limit voltage)
+    1420, # (0x9005 = 14.20V - Over voltage reconnect)
+    1400, # (0x9006 = 14.00V - Equalization voltage)
+    1380, # (0x9007 = 13.80V - Boost voltage)
+    1380, # (0x9008 = 13.80V - Float voltage)
+    1320, # (0x9009 = 13.20V - Boost reconnect voltage)
+    1240, # (0x900A = 12.40V - Low voltage reconnect)
+    1200, # (0x900B = 12.00V - Under voltage recover OR Under voltage Warning Reconnect)
+    1160, # (0x900C = 11.60V - Under voltage warning)
+    1080, # (0x900D = 10.80V - Low voltage disconnect)
+    1040, # (0x900E = 10.40V - Discharging limit voltage)
+]
 
 class SolarTracer:
 	"""A member of SolarTracer communication class."""
@@ -99,6 +164,63 @@ class SolarTracer:
 	    except ValueError:
     			print "Could not convert data!"
     			return -3
+
+	
+	################# Status & Settings ###############
+	def statLoad(self, newStatus = -1, decimals=0,func=3):
+		if (newStatus > 0):
+			try:
+				self.writeParam(LoadManualStatus, newStatus)
+			except IOError:
+				return -3
+		try:
+			reading = self.instrument.read_register(LoadManualStatus, decimals, func)
+			return reading
+		except IOError:
+			return -2
+
+	### Output battery settings to the console (temp. coefficient omitted)
+	def printBatterySettings(self):
+		settingsReg = []
+		try:
+			settingRegs = self.instrument.read_registers(settingsRegBlockStart, settingsRegBlockLength)
+		except IOError:
+			return -2
+
+		idx = 0
+		for param in settingRegs:
+			if (idx == 0):
+				print "{:<25}: {:<4}({:<1})".format(tracerSettingsNames[idx], tracerBatteryType[idx], param)
+			elif (idx == 1):
+				print "{:<25}: {:<4}Ah".format(tracerSettingsNames[idx], param)
+			elif (idx == 2):
+				next
+			else:
+				print "{:<25}: {:.1f}".format(tracerSettingsNames[idx], float(param)/100)
+			idx = idx + 1
+
+	### Set battery settings
+	def setBatterySettings(self, settingsList, batteryCapacity=100, batteryVoltage=12):
+		### WRITE MULTIPLE REGISTERS
+		newSettings = settingsList
+		if (batteryCapacity <> 100):
+			newSettings[1] = batteryCapacity
+		if (batteryVoltage > 12):
+			voltAdjust = batteryVoltage / 12
+			idx = 0
+			for voltage in newSettings:
+				if (idx > 2):
+					newSettings[idx] = newSettings[idx] * voltAdjust
+				idx = idx + 1
+
+		# write all settings to the controller
+		try:
+			self.instrument.write_registers(settingsRegBlockStart, newSettings)
+			return 0
+		except IOError:
+			return -2
+
+
 
 
 
