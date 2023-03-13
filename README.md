@@ -112,7 +112,7 @@ Current settings are for 24V LiFePO4 (300Ah), however the script can be easily c
 See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository
 For example,
 
-''' up.setBatterySettings(batteryLiFePO4, 300, 12)
+`up.setBatterySettings(batteryLiFePO4, 300, 12)`
 
 will set your battery to 300Ah, 12V LiFePO4
 
