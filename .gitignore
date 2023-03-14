@@ -1,2 +1,8 @@
 .DS_Store
-*.pyc 
+*.pyc
+*.o
+*.cmd
+*.a
+*.ko
+*.mod.c
+._* 
