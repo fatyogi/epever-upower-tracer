@@ -25,11 +25,22 @@ localtime = time.localtime()
 timestamp = time.strftime("%H:%M:%S", localtime)
 timestamp = datetime.datetime.utcnow()
 
-# calculate compound values
-PVwatt = up.readReg(PVwattH)
-PVwatt = ((int(PVwatt) << 16) + up.readReg(PVwattL));
-DCwatt = up.readReg(DCwattH)
-DCwatt = ((int(DCwatt) << 16) + up.readReg(DCwattL));
+# calculate compound values - did not work!
+# sometimes it returns large NEGATIVE values
+# temporarily coming back to the lower part of the word only
+#PVwatt = up.readReg(PVwattH)
+#PVwatt = ((int(PVwatt) << 16) + up.readReg(PVwattL));
+#DCwatt = up.readReg(DCwattH)
+#DCwatt = ((int(DCwatt) << 16) + up.readReg(DCwattL));
+
+PVvolt = up.readReg(PVvolt)
+PVamps = up.readReg(PVamps)
+PVwatt = round(PVvolt * PVamps, 2)
+
+DCvolt = up.readReg(DCvolt)
+DCamps = up.readReg(DCamps)
+DCwatt = round(DCvolt * DCamps, 2)
+
 
 # form a data record
 body_solar = [
@@ -37,16 +48,16 @@ body_solar = [
         "measurement": measurement_name,
         "time": timestamp,
         "fields": {
-            "PVvolt": up.readReg(PVvolt),
-            "PVamps": up.readReg(PVamps),
+            "PVvolt": PVvolt,
+            "PVamps": PVamps,
             "PVwatt": PVwatt,
             "PVkwh": up.readReg(PVkwhTotal),
             "PVkwh2d": up.readReg(PVkwhToday),
             "BAvolt": up.readReg(BAvolt),
             "BAamps": up.readReg(BAamps),
             "BAperc": up.readReg(BAperc),
-            "DCvolt": up.readReg(DCvolt),
-            "DCamps": up.readReg(DCamps),
+            "DCvolt": DCvolt,
+            "DCamps": DCamps,
             "DCwatt": DCwatt,
             "DCkwh": up.readReg(DCkwhTotal),
             "DCkwh2d": up.readReg(DCkwhToday),
