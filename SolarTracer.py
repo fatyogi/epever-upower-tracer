@@ -4,6 +4,9 @@ import minimalmodbus
 ON = 1
 OFF = 0
 
+# Float conversion for Python 3
+FloatConv = 0.0
+
 # PV array
 PVvolt = 0x3100
 PVamps = 0x3101
@@ -139,10 +142,10 @@ class SolarTracer:
 	    return 0
 
 	# read informational register
-	def readReg(self,register):
+	def readReg(self,register) -> float:
 	    try:
 	            reading = self.instrument.read_register(register, 2, 4)
-	            return reading
+	            return (reading + FloatConv)
 	    except IOError:
 	            return -2
 
@@ -162,7 +165,7 @@ class SolarTracer:
 	    except IOError as err:
 	    		return -2
 	    except ValueError:
-    			print "Could not convert data!"
+    			print ("Could not convert data!")
     			return -3
 
 	
@@ -190,20 +193,20 @@ class SolarTracer:
 		idx = 0
 		for param in settingRegs:
 			if (idx == 0):
-				print "{:<25}: {:<4}({:<1})".format(tracerSettingsNames[idx], tracerBatteryType[idx], param)
+				print ("{:<25}: {:<4}({:<1})".format(tracerSettingsNames[idx], tracerBatteryType[idx], param))
 			elif (idx == 1):
-				print "{:<25}: {:<4}Ah".format(tracerSettingsNames[idx], param)
+				print ("{:<25}: {:<4}Ah".format(tracerSettingsNames[idx], param))
 			elif (idx == 2):
 				next
 			else:
-				print "{:<25}: {:.1f}".format(tracerSettingsNames[idx], float(param)/100)
+				print ("{:<25}: {:.1f}".format(tracerSettingsNames[idx], float(param)/100))
 			idx = idx + 1
 
 	### Set battery settings
 	def setBatterySettings(self, settingsList, batteryCapacity=100, batteryVoltage=12):
 		### WRITE MULTIPLE REGISTERS
 		newSettings = settingsList
-		if (batteryCapacity <> 100):
+		if (batteryCapacity != 100):
 			newSettings[1] = batteryCapacity
 		if (batteryVoltage > 12):
 			voltAdjust = batteryVoltage / 12
