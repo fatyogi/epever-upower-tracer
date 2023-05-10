@@ -6,10 +6,11 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 **EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
 ## Requirements
-- Python 2.7 (standard Python coming with Raspberry Pi) - NOTE: in the future versions of Raspbian - Python 3 will be used, however the code should work fine with this version too - just make sure you use pip3 instead of pip.
-- Influx DB and its Python 2.7 modules
+- Python 3  (UPower scripts are still running 2.7 as I had no chance to test on UPower device recently)
+- Influx DB and its Python 3 modules (use pip3 to install)
 - Grafana - latest, whatever is availabe in your Raspbian
 - To communicate with the devices you will need [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
+- SDM230 device is read using [nmakel/sdm_modbus](https://github.com/nmakel/sdm_modbus)
 
 Make sure you install the Linux driver for Exar USB UART first
 --------------------------------------------------------------
