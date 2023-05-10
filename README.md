@@ -82,8 +82,8 @@ Grafana Dashboard
 --------------------
 Some very basic knowledge of InfluxDB and Grafana is assumed here.
 
-![Img](grafana/screenshot.png)
-The [grafana/](grafana/) folder contains the dashboard to monitor realtime and historical solar charging data.
+![Img](grafana/AC_DC_SolarDashboard.png)
+The [grafana/](grafana/) folder contains the dashboard(s) to monitor realtime and historical solar charging data.
 
 ## Grafana/InfluxDB installation
 
@@ -116,5 +116,12 @@ For example,
 
 will set your battery to 300Ah, 12V LiFePO4
 
-
 `ivctl.py` may be used to switch the inverter off/on for the night
+
+Tracer with Eastron SDM230
+--------------------------
+
+# SDM230 support
+
+[Eastron SDM230](https://www.eastroneurope.com/images/uploads/products/manuals/SDM230_Sereis_Manual.pdf) is a simple meter that measure AC if you have an external inverter. **sdm230/** directory contains scripts to query the device.
+**logsdmtracer** - is the script that queries both Epever Tracer and the SDM 230

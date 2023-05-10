@@ -1,4 +1,4 @@
-#SDM230 support
+# SDM230 support
 
 Eastron SDM230 is a simple device that measure AC if you have an inverter.
 These scripts are to query the device.
