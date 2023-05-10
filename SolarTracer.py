@@ -1,3 +1,5 @@
+# This package is now supported under Python 3
+
 import minimalmodbus
 
 # on/off
