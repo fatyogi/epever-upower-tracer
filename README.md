@@ -14,30 +14,16 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 Make sure you install the Linux driver for Exar USB UART first
 --------------------------------------------------------------
-The [xr_usb_serial_common](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS on a raspberry pi 3. Before compiling be sure to install the linux headers with
+The [xr_usb_serial_common-1a](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS with Linux kernels up to 3.5
+Another [xr_usb_serial_common-1a-linux-3.6+](xr_usb_serial_common-1a-linux-3.6+/) directory has the drive for Linux kernels 3.6 and over.
+
+Before compiling be sure to install the linux headers with
 `sudo apt-get install raspberrypi-kernel-headers`
 
-After installing the headers be sure to `sudo bundle` then `sudo make`.
-The resulting `xr_usb_serial_common.ko` file will need to be moved to `/lib/modules/YOUR_LINUX_VERSION/extra/`.
-After building and moving the module, remove the cdc-acm driver that automatically installs for the usb-485 adapter.
+After installing the headers be sure to `sudo bundle` then `sudo make` and `sudo make install`.
+The resulting `xr_usb_serial_common.ko` file will then be moved to `/lib/modules/YOUR_LINUX_KERNEL_VERSION/tty/serial`.
 
-`rmmod cdc-acm`
-
-`modprobe -r usbserial`
-
-`modprobe usbserial`
-
-You will also need to add the cdc-acm to the system blacklist:
-
-`echo blacklist cdc-acm > /etc/modprobe.d/blacklist-cdc-acm.conf`
-Note: If echo doesnt work you will need to add `blacklist cdc-acm` manually to the blacklist with vim `vi /etc/modprobe.d/blacklist-cdc-acm.conf`
-
-Finally add `xr_usb_serial_common` to '/etc/modules' to autoload the module on startup.
-
-After all of this is done make sure that the new driver loads correctly by reloading the linux dependency list `depmod -ae`
-Then load the module with `modprobe xr_usb_serial_common`
-
-If all goes well you should see `ttyXRUSB` when listing `ls /dev/tty*`
+If all goes well you should see `ttyXRUSB0` when listing `ls -la /dev/ttyXR*`
 
 Reboot and enjoy!
 
@@ -64,20 +50,21 @@ By default these scripts write the output into the console (as well as the datab
 
 ## Setting up a cron job to run this script regularly:
 
-1. First make `logupower.py` and `logtracer.py` executable:
-`sudo chmod +x log*.py`
+1. First make `logupower.py` or `logtracer.py` or `logsdmtracer.py` executable:
+
+	`sudo chmod +x log*.py`
 
 3. Now add the cron job:
 
-`crontab -e`
+	`crontab -e`
 
-3. add the line to log the values every minute (this is for the Tracer model):
+3. add the line to log the values every minute (this is for the Tracer model, choose another logger that suits you):
 
-`* * * * *  cd /home/pi/epever-upower-tracer && python logtracer.py > /dev/null`
+	`* * * * *  cd /home/pi/epever-upower-tracer && python3 logtracer.py > /dev/null`
 
 4. you can add another line if you want it every half a minute:
 
-`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
+	`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
 
 Grafana Dashboard
 --------------------
@@ -106,23 +93,27 @@ Use "solar" dataset to import the values from when setting up the console.
 
 Additional scripts
 ------------------
-`setTracerSettings.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
+* `getTracerSettings.py` queries settings of the Tracer AN and displays all current voltages
+* `setTracerSettings.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
 
-Current settings are for 24V LiFePO4 (300Ah), however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
+Current settings in the script are for 24V LiFePO4 (300Ah), however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
 
 See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository
 For example,
 
-`up.setBatterySettings(batteryLiFePO4, 300, 12)`
+	`up.setBatterySettings(batteryLiFePO4, 300, 12)`
 
 will set your battery to 300Ah, 12V LiFePO4
 
-`ivctl.py` may be used to switch the inverter off/on for the night
+* `ivctl.py` may be used to switch the UPower's internal inverter off/on for the night
 
 Tracer with Eastron SDM230
 --------------------------
 
 # SDM230 support
 
-[Eastron SDM230](https://www.eastroneurope.com/images/uploads/products/manuals/SDM230_Sereis_Manual.pdf) is a simple meter that measure AC if you have an external inverter. **sdm230/** directory contains scripts to query the device.
-**logsdmtracer** - is the script that queries both Epever Tracer and the SDM 230
+[Eastron SDM230](https://www.eastroneurope.com/images/uploads/products/manuals/SDM230_Sereis_Manual.pdf) is a simple meter that measure AC if you have an external inverter.
+The [sdm239/](sdm230/) directory contains scripts to query the device.
+
+`logsdmtracer` - is the script that queries both Epever Tracer and the SDM 230 and records into InfluxDB
+It adds the Inverter values such as IVvolt, IVwatt and IVison (=1 if the meter is on) into the same `solar` measurement.
