@@ -18,17 +18,7 @@ Installation
 * Compile and install the common usb serial driver module
 
 	# make
-	# insmod ./xr_usb_serial_common.ko
-
-* Alternativley install via DKMS
-	# cp -a ../xr_usb_serial_common-1a /usr/src/
-	# dkms add -m xr_usb_serial_common -v 1a
-	# dkms build -m xr_usb_serial_common -v 1a
-	# dkms install -m xr_usb_serial_common -v 1a
-
-* Ensure that thecdc-acm module is not loaded (assumig that it is not needed)
-	# echo blacklist cdc-acm > /etc/modprobe.d/blacklist-cdc-acm.conf 
-	# update-initramfs -u
+	# make install
 
 * Plug the device into the USB host.  You should see up to four devices created,
   typically /dev/ttyXRUSB[0-3].
@@ -51,6 +41,8 @@ Tips for Debugging
 	# modprobe -r usbserial
 	# modprobe usbserial
 	# insmod ./xr_usb_serial_common.ko
+	
+	Note - the Make script does it automatically on `make install`
 
 
 Technical Support
