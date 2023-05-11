@@ -14,9 +14,12 @@ modules_install:
 clean:
 	rm -rf *.o *~ core .depend .*.cmd *.ko *.mod.c .tmp_versions vtty
 
+cleanall: clean
+	@echo Removing Exar drivers from /lib/modules/`uname -r`/kernel/drivers/tty/serial
+	sudo rm -f /lib/modules/`uname -r`/kernel/drivers/tty/serial/xr*
+
 install: all
 	sudo cp blacklist-cdc-acm.conf /etc/modprobe.d/
-	@test -f /lib/modules/`uname -r`/kernel/drivers/tty/serial/xr_usb_serial_common.ko && echo "Reinstalling the existing driver in /lib/modules/`uname -r`/kernel/drivers/tty/serial/"
 	sudo cp xr_usb_serial_common.ko /lib/modules/`uname -r`/kernel/drivers/tty/serial
 	sudo depmod -ae
 	sudo update-initramfs -u

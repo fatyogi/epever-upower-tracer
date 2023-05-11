@@ -6,3 +6,4 @@
 *.ko
 *.mod.c
 ._* 
+__pycache__
