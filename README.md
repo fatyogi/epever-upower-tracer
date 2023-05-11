@@ -14,8 +14,9 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 Make sure you install the Linux driver for Exar USB UART first
 --------------------------------------------------------------
-The [xr_usb_serial_common-1a](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS with Linux kernels up to 3.5
-Another [xr_usb_serial_common-1a-linux-3.6+](xr_usb_serial_common-1a-linux-3.6+/) directory has the drive for Linux kernels 3.6 and over.
+The [xr_usb_serial_common-1a](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS with Linux kernels up to v3.5.
+
+Another [xr_usb_serial_common-1a-linux-3.6+](xr_usb_serial_common-1a-linux-3.6+/) directory has the drive for Linux kernels v3.6 and over.
 
 Before compiling be sure to install the linux headers with
 `sudo apt-get install raspberrypi-kernel-headers`

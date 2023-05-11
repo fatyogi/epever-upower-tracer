@@ -65,16 +65,20 @@ def readsdm230( DEVICE="/dev/ttyXRUSB1",STOPBITS=1,PARITY="N",BAUD=9600,TIMEOUT=
     else:
         for k, v in regs.items():
             address, length, rtype, dtype, vtype, label, fmt, batch, sf = meter.registers[k]
+# Uncomment for debugging
 #            print(f"{label} = {k} --> {v:.2f}{fmt}")
             if k == "voltage": IVvolt=round(v,2)
             if k == "current": IVamps=round(v,2)
             if k == "power_active": IVwatt=round(v,2)
+    # Sometimes the meter returns a weird value of 12000 watt or over, which messes up the graph. Blocking that behaviour.
+    if (IVwatt > 5000): IVwatt = 0.0;
     return (IVvolt,IVamps,IVwatt,IVison)
 
 
 (IVvolt,IVamps,IVwatt,IVison) = readsdm230()
 
-print (f"\nIVvolt={IVvolt}, IVamps= {IVamps}, IVwatt={IVwatt}, IVison={IVison}")
+# Uncomment for debugging
+#print (f"\nIVvolt={IVvolt}, IVamps= {IVamps}, IVwatt={IVwatt}, IVison={IVison}")
 
 
 # form a data record
