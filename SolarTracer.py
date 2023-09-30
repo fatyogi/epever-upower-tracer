@@ -37,6 +37,8 @@ DCkwhTotal = 0x330A
 PVkwhToday = 0x330C
 DCkwhToday = 0x3304
 
+ControllerTemp = 0x3111
+
 # Settings
 BatteryType=0x9000
 BatteryCapacity=0x9001
