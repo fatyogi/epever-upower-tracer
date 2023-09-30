@@ -1677,6 +1677,7 @@ static const struct usb_device_id xr_usb_serial_ids[] = {
 	{ USB_DEVICE(0x04e2, 0x1401)},
 	{ USB_DEVICE(0x04e2, 0x1402)},
 	{ USB_DEVICE(0x04e2, 0x1403)},
+	{ USB_DEVICE(0x1a86, 0x55d3)},
 	{ }
 };
 
