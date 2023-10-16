@@ -1,6 +1,8 @@
 # Get info from Tracer
-* * * * *  cd /home/pi/solartracer && python logtracer.py > /dev/null
-#* * * * *  cd /home/pi/solartracer && sleep 30 && python logtracer.py > /dev/null
+# Get current values every minute
+* * * * *  cd /home/pi/epever-upower-tracer && ./logtracer.py > /dev/null
+# Get statistical values every hour at :00
+0 * * * *  cd /home/pi/epever-upower-tracer && ./logtracerstats.py > /dev/null
 
 # UPower - switch the invertor on and off for the night/day
 # invertor off
