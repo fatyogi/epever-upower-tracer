@@ -1,28 +1,15 @@
 #!/usr/bin/python3
-
-import sys
-import datetime
-import time
-import minimalmodbus
-from influxdb import InfluxDBClient
 from SolarTracer import *
 
-up = SolarTracer()
-if (up.connect() < 0):
-	print ("Could not connect to the device")
-	exit -2
+tracer = SolarTracer(debug=1)
+print (tracer)
 
-# get timestamps
-localtime = time.localtime()
-localstamp = time.strftime("%H:%M:%S", localtime)
-timestamp = datetime.datetime.utcnow()
+# Display current settings
+tracer.printBatterySettings()
 
-# form a data record
-print ("Local time:", localstamp)
-print ("UTC timestamp:", timestamp)
-print
+# Use setBatterySettings(batteryLiFePO4, 300) to set a 12V LiFePO4 battery of 300 Ah capacity
+# Use setBatterySettings(batteryLiFePO4, 500, 48) to set a 24V LiFePO4 battery of 500 Ah capacity
+tracer.setBatterySettings(batteryLiFePO4, 160)
 
-
-up.setBatterySettings(batteryLiFePO4, 180, 12)
-print
-up.printBatterySettings()
+# Verify new settings
+tracer.printBatterySettings()

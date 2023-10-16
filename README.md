@@ -21,12 +21,12 @@ Another [xr_usb_serial_common-1a-linux-3.6+](xr_usb_serial_common-1a-linux-3.6+/
 Before compiling be sure to install the linux headers with
 `sudo apt-get install raspberrypi-kernel-headers`
 
-After installing the headers be sure to `sudo bundle` then `sudo make` and `sudo make install`.
-The resulting `xr_usb_serial_common.ko` file will then be moved to `/lib/modules/YOUR_LINUX_KERNEL_VERSION/tty/serial`.
-
-If all goes well you should see `ttyXRUSB0` when listing `ls -la /dev/ttyXR*`
+After installing the headers be sure to do `make` and `sudo make install`.
+The resulting `xr_usb_serial_common.ko` driver file will be moved to `/lib/modules/YOUR_LINUX_KERNEL_VERSION/tty/serial`.
 
 Reboot and enjoy!
+
+If all goes well you should see `ttyXRUSB0` when listing `ls -la /dev/ttyXR*`
 
 Device communications protocols
 ---------------------
