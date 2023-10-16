@@ -1,15 +1,17 @@
-# This package is now supported under Python 3
+# Full rewrite of SolarTracer.py for Python3
+# No ugly int to float conversions
+# Reading multiple registers into dict
+# The module is aware of the registers
 
+# readCurrent() and readStats() are two separate methods
+# that return all necessary values
+
+import sys
+import datetime
+import time
 import minimalmodbus
 
-# on/off
-ON = 1
-OFF = 0
-
-# Float conversion for Python 3
-FloatConv = 0.0
-
-# PV array
+#### Current values registers ####
 PVvolt = 0x3100
 PVamps = 0x3101
 PVwattL = 0x3102
@@ -24,6 +26,9 @@ BAwattH = 0x3107
 BAtemp = 0x3110
 BAperc = 0x311A
 BAstat = 0x3200
+BAcurL = 0x331B
+BAcurH = 0x331C
+
 
 # DC load
 DCvolt = 0x310C
@@ -31,34 +36,14 @@ DCamps = 0x310D
 DCwattL = 0x310E
 DCwattH = 0x310F
 
-# Statistics
+#### Statistics registers ####
 PVkwhTotal = 0x3312
 DCkwhTotal = 0x330A
 PVkwhToday = 0x330C
 DCkwhToday = 0x3304
 
-# Settings
-BatteryType=0x9000
-BatteryCapacity=0x9001
-TempCompensationCoeff=0x9002
-OverVoltageDisconnect=0x9003
-ChargingLimitVoltage=0x9004
-OverVoltageReconnect=0x9005
-EqualizationVoltage=0x9006
-BoostVoltage=0x9007
-FloatVoltage=0x9008
-BoostReconnectVoltage=0x9009
-LowVoltageReconnect=0x900A
-UnderVoltageRecover=0x900B
-UnderVoltageWarning=0x900C
-LowVoltageDisconnect=0x900D
-DischargingLimitVoltage=0x900E
-# Load settings
-LoadControlMode=0x903D
-LoadControlModes = ["Manual Control", "Light ON/OFF", "Light ON+ Timer", "Time Control"]
-LoadManualStatus = 0x906A
-
-settingsRegBlockStart = 36864
+###### Battery settings ######
+settingsRegBlockStart = 0x9000
 settingsRegBlockLength = 15
 tracerSettingsNames = ["BatteryType", 
                 "BatteryCapacity",
@@ -79,9 +64,7 @@ tracerSettingsNames = ["BatteryType",
 tracerBatteryType = ["USER","SEALED","GEL","FLOODED"]
 
 ##### Battery settings for a type (12V)
-##### Source: Victron Energy Manual
-##### Use setBatterySettings(batteryLiFePO4, 300) to set a 12V LiFePO4 battery of 300 Ah capacity
-##### Use setBatterySettings(batteryLiFePO4, 500, 48) to set a 24V LiFePO4 battery of 500 Ah capacity
+##### Source: Victron Energy Manual 
 
 batteryLeadAcid = [
     0x0,  # (0x9000 = 0000H - User defined)
@@ -120,112 +103,178 @@ batteryLiFePO4 = [
 ]
 
 class SolarTracer:
-	"""A member of SolarTracer communication class."""
+    """Class representing a Tracer device"""
 
-	# connect to device
-	def __init__(self, device = '/dev/ttyXRUSB0', serialid = 1):
-		self.device = device
-		self.id = serialid
-		self.instrument = 0
+    # Solar Tracer constructor
+    def __init__(self, device = '/dev/ttyXRUSB0', serialid = 1, debug = 0):
+        self.device = device
+        self.id = serialid
+        self.debug = debug
 
+        try:
+            instrument = minimalmodbus.Instrument(self.device, self.id)
+            if (self.debug>0):
+                print("DEBUG: successfully connected to", self.device)
+            
+            # set instrument Serial settings
+            instrument.serial.baudrate = 115200
+            instrument.serial.bytesize = 8
+            instrument.serial.parity   = minimalmodbus.serial.PARITY_NONE
+            instrument.serial.stopbits = 1
+            instrument.serial.timeout  = 2
+            instrument.mode = minimalmodbus.MODE_RTU
+            instrument.debug = False
 
-	def connect(self):
-	    try:
-	            self.instrument = minimalmodbus.Instrument(self.device, self.id)
-	    except minimalmodbus.serial.SerialException:
-	            return -1
+            self.instrument = instrument
+            self.connected = True
 
-	    self.instrument.serial.baudrate = 115200
-	    self.instrument.serial.bytesize = 8
-	    self.instrument.serial.parity   = minimalmodbus.serial.PARITY_NONE
-	    self.instrument.serial.stopbits = 1
-	    self.instrument.serial.timeout  = 1.2
-	    self.instrument.mode = minimalmodbus.MODE_RTU
-	    return 0
+        except IOError:
+            self.connected = False
+            print("ERROR: Failed to connect to", self.device, file=sys.stderr)
+            sys.exit(1)
 
-	# read informational register
-	def readReg(self,register) -> float:
-	    try:
-	            reading = self.instrument.read_register(register, 2, 4)
-	            return (reading + FloatConv)
-	    except IOError:
-	            return -2
+    # Solar Tracer destructor
+    def __del__(self):
+        """Destruct the SolarTracer object"""
+        if self.connected:
+            self.instrument.serial.close()
+            if self.debug>0: print("DEBUG: successfully disconnected", self.device)
 
-	# read parameter
-	def readParam(self,register,decimals=2,func=3):
-	    try:
-	            reading = self.instrument.read_register(register, decimals, func)
-	            return reading
-	    except IOError:
-	            return -2
+    # String representation of a controller
+    def __str__(self) -> str:
+        stat = "disconnected"
+        if self.connected: stat = "connected"
+        return f"{self.device}({self.id}): {stat}"
+    
+    # Get current timestamp
+    def getTimestamp(self):
+        """Get current timestamp from the system"""
+        localtime = time.localtime()
+        localstamp = time.strftime("%H:%M:%S", localtime)
+        timestamp = datetime.datetime.utcnow()
+        if self.debug > 0: print ("DEBUG: Local time", localstamp, ", UTC timestamp", timestamp)
+        return timestamp
+    
+    # Read Register
+    def readReg(self,register) -> float:
+        """Read a float register from the Tracer"""
+        try:
+            value = float(self.instrument.read_register(register, 2, 4))
+            if self.debug > 0: print ("DEBUG: Successfully read from 0x%X" % register)
+            return value
+        except IOError:
+            print("ERROR: Failed to read from 0x%X" % register, file=sys.stderr)
+            return -1
 
-	# write parameter
-	def writeParam(self,register,value,decimals=2,func=16):
-	    try:
-	            reading = self.instrument.write_register(register, value, decimals, func)
-	            return 0
-	    except IOError as err:
-	    		return -2
-	    except ValueError:
-    			print ("Could not convert data!")
-    			return -3
+    ### Output battery settings to the console (temp. coefficient omitted)
+    def printBatterySettings(self):
+        """Read battery settings and print out"""
+        settingRegs = self.instrument.read_registers(settingsRegBlockStart, settingsRegBlockLength)
+        idx = 0
+        for param in settingRegs:
+            if (idx == 0):
+                print ("{:<25}: {:<4}({:<1})".format(tracerSettingsNames[idx], tracerBatteryType[idx], param))
+            elif (idx == 1):
+                print ("{:<25}: {:<4}Ah".format(tracerSettingsNames[idx], param))
+            elif (idx == 2):
+                next
+            else:
+                print ("{:<25}: {:.1f}".format(tracerSettingsNames[idx], float(param)/100))
+            idx += 1
 
-	
-	################# Status & Settings ###############
-	def statLoad(self, newStatus = -1, decimals=0,func=3):
-		if (newStatus > 0):
-			try:
-				self.writeParam(LoadManualStatus, newStatus)
-			except IOError:
-				return -3
-		try:
-			reading = self.instrument.read_register(LoadManualStatus, decimals, func)
-			return reading
-		except IOError:
-			return -2
+    ### Set battery settings
+    def setBatterySettings(self, settingsList, batteryCapacity=100, batteryVoltage=12) -> int:
+        """Set battery setting by writing multiple registers"""
+        """Use setBatterySettings(batteryLiFePO4, 300) to set a 12V LiFePO4 battery of 300 Ah capacity"""
+        """Use setBatterySettings(batteryLiFePO4, 500, 48) to set a 24V LiFePO4 battery of 500 Ah capacity"""
+        newSettings = settingsList
+        if (batteryCapacity != 100):
+            newSettings[1] = batteryCapacity
+        if (batteryVoltage > 12):
+            voltAdjust = batteryVoltage / 12
+            idx = 0
+            for voltage in newSettings:
+                if (idx > 2):
+                    newSettings[idx] = newSettings[idx] * voltAdjust
+                idx = idx + 1
+        # write all settings to the controller
+        try:
+            if self.debug>0: print ("DEBUG: Writing new settings to %s(%d)" % (self.device, self.id))
+            self.instrument.write_registers(settingsRegBlockStart, newSettings)
+            return 0
+        except IOError:
+            if self.debug>0: print ("DEBUG: failed writing settings to %s!" % self.device)
+            return -2
+            
 
-	### Output battery settings to the console (temp. coefficient omitted)
-	def printBatterySettings(self):
-		settingsReg = []
-		try:
-			settingRegs = self.instrument.read_registers(settingsRegBlockStart, settingsRegBlockLength)
-		except IOError:
-			return -2
+    def readCurrent(self) -> dict:
+        tracerCurrent = {}
+        regs = []
+        
+        # Reading the block of current value registers
+        blk = 0x3100
+        numreg = 0x12
+        if self.debug>0: print("DEBUG reading %d registers starting at 0x%X from %s" % (numreg, blk, self.device))
+        try:
+            regs = self.instrument.read_registers(blk, numreg, 4)
+            if self.debug>0: print ("DEBUG Registers:", regs)
+        except IOError:
+            print("Failed to read %d registers at 0xX from %s" % (numreg, blk1, self.device), file=sys.stderr)
+            return []
 
-		idx = 0
-		for param in settingRegs:
-			if (idx == 0):
-				print ("{:<25}: {:<4}({:<1})".format(tracerSettingsNames[idx], tracerBatteryType[idx], param))
-			elif (idx == 1):
-				print ("{:<25}: {:<4}Ah".format(tracerSettingsNames[idx], param))
-			elif (idx == 2):
-				next
-			else:
-				print ("{:<25}: {:.1f}".format(tracerSettingsNames[idx], float(param)/100))
-			idx = idx + 1
+        tracerCurrent = {
+                "PVvolt": regs[0]/100.0,
+                "PVamps": regs[1]/100.0,
+                "PVwatt": regs[2]/100.0, # round((regs[0]/100)*(regs[1]/100),2)
+                # reg[3] contains high bits of PVwatt, which are not currently processed
+                "BAvolt": regs[4]/100.0,
+                "BAamps": regs[5]/100.0,
+                "BAwatt": regs[6]/100.0, # round((regs[4]/100)*(regs[5]/100),2)
+                # reg[7] contains high bits of BAwatt, which are not currently processed
+                # reg[8], reg[9], reg[0xA], reg[0xB] - empty for now
+                "DCvolt": regs[0xC]/100.0,
+                "DCamps": regs[0xD]/100.0,
+                "DCwatt": regs[0xE]/100.0,
+                # reg[0xF] contains high bits of DCwatt, which are not currently processed
+                "BAtemp": regs[0x10]/100.0,
+                "CTtemp": regs[0x11]/100.0,
+                }
+        
+        # additional registers here
+        # read the isolated "battery" registers
+        BApc = self.readReg(BAperc)
+        if BApc>0:
+            addic = {"BAperc": BApc*100}
+            tracerCurrent.update(addic)
+        BAcr = self.readReg(BAcurL)
+        if BAcr>0:
+            addic = {"BAcurr": round(BAcr/100.0,4)}
+            tracerCurrent.update(addic)
 
-	### Set battery settings
-	def setBatterySettings(self, settingsList, batteryCapacity=100, batteryVoltage=12):
-		### WRITE MULTIPLE REGISTERS
-		newSettings = settingsList
-		if (batteryCapacity != 100):
-			newSettings[1] = batteryCapacity
-		if (batteryVoltage > 12):
-			voltAdjust = batteryVoltage / 12
-			idx = 0
-			for voltage in newSettings:
-				if (idx > 2):
-					newSettings[idx] = newSettings[idx] * voltAdjust
-				idx = idx + 1
+        return tracerCurrent
 
-		# write all settings to the controller
-		try:
-			self.instrument.write_registers(settingsRegBlockStart, newSettings)
-			return 0
-		except IOError:
-			return -2
-
-
-
-
-
+    def readStats(self) -> dict:
+        tracerStats = {}
+        regs = []
+        blk = 0x3300
+        numreg = 0x3314-blk
+        if self.debug>0: print("DEBUG reading %d registers starting at 0x%X from %s" % (numreg, blk, self.device))
+        try:
+            regs = self.instrument.read_registers(blk, numreg, 4)
+            if self.debug>0: print ("DEBUG Registers:", regs)
+        except IOError:
+            print("Failed to read %d registers at 0xX from %s" % (numreg, blk1, self.device), file=sys.stderr)
+            return []
+        else:
+            tracerStats = {
+                "DCkwh2d" : regs[0x04]/100.0, # KWH consumed today L
+                "DCkwhTm" : regs[0x06]/100.0, # KWH consumed this month L
+                "DCkwhTY" : regs[0x08]/100.0, # KWH consumed this year (from 01 Jan) L
+                "DCkwhTT" : regs[0x0a]/100.0, # KWH consumed TOTAL L
+                "PVkwh2d" : regs[0x0c]/100.0, # KWH generated today L
+                "PVkwhTm" : regs[0x0e]/100.0, # KWH generated this month L
+                "PVkwhTY" : regs[0x10]/100.0, # KWH generated this year (from 01 Jan) L
+                "PVkwhTT" : regs[0x12]/100.0, # KWH consumed TOTAL L
+            }
+            return tracerStats
+        
