@@ -1,3 +1,5 @@
+from influxdb import InfluxDBClient
+
 # influx configuration - edit these
 ifuser = "grafana"
 ifpass = "solar"
