@@ -5,7 +5,7 @@ from SolarTracer import *
 from InfluxConf import *
 
 measurement_name = "solar_stats"
-tracer = SolarTracer(debug=0)
+tracer = SolarTracer(TRACER_PORT,debug=0)
 
 try:
     body_stats = [

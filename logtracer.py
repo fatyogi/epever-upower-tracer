@@ -5,7 +5,7 @@ from SolarTracer import *
 from InfluxConf import *
 
 # connect to the Tracer
-tracer = SolarTracer(debug=0)
+tracer = SolarTracer(TRACER_PORT, debug=0)
 measurement_name = "solar"
 
 try:

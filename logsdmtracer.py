@@ -5,7 +5,7 @@ from SolarTracer import *
 from sdm230 import *
 
 # connect to the Tracer
-tracer = SolarTracer(debug=0)
+tracer = SolarTracer(TRACER_PORT, debug=0)
 
 # connect to Influx
 ifclient = InfluxDBClient(ifhost,ifport,ifuser,ifpass,ifdb)
@@ -28,7 +28,7 @@ else:
 
 ######### Reading the SDM (AC data) ###########
 try:
-    acpower = readsdm230()
+    acpower = readsdm230(SDM_PORT)
 except IOError:
     print("Could not obtain measurements from SDM230", file=sys.stderr)
 else:
