@@ -52,7 +52,7 @@ By default these scripts write the output into the console (as well as the datab
 
 ## Setting up a cron job to run this script regularly:
 
-1. First make `logupower.py` or `logtracer.py` or `logsdmtracer.py` or `logexecutable:
+1. First make `logupower.py` or `logtracer.py` or `logsdmtracer.py` and `logtracerstats.py` executable:
 
 	`sudo chmod +x log*.py`
 
