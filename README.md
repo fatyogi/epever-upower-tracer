@@ -44,14 +44,15 @@ Install minimalmodbus first:
 
 Logging scripts
 --------------
-The file `logtracer.py` will query the Tracer AN/BN controller for relevant data and store into Influx DB.
-The file `logupower.py` will query the UPower inverter for relevant data and store into Influx DB.
+The file `logtracer.py` queries the Tracer AN/BN controller for relevant data and stores into Influx DB.
+The file `logtracerstats.py` queries the Tracer AN/BN controller for Statistical data (such as the energy produced over today, last month, year etc.) and stores it into Influx DB.
+The file `logupower.py` queries the UPower inverter for relevant data and stores into Influx DB.
 
 By default these scripts write the output into the console (as well as the database). Use > /dev/null to make them "silent".
 
 ## Setting up a cron job to run this script regularly:
 
-1. First make `logupower.py` or `logtracer.py` or `logsdmtracer.py` executable:
+1. First make `logupower.py` or `logtracer.py` or `logsdmtracer.py` or `logexecutable:
 
 	`sudo chmod +x log*.py`
 
@@ -67,17 +68,18 @@ By default these scripts write the output into the console (as well as the datab
 
 	`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
 
-6. if you need the statistical values (such as the energy accumulated/generated today, over last month, year and in total) you should add another logger into cron, and this logger does not have to run every minute. For example, here we have the Statistics logger running every hour:
+6. if you need the statistical values (such as the energy accumulated/generated today, over last month, year and in total) you should add another logger into cron, and this logger DOES NOT have to run every minute. For example, here we have the Statistics logger running every hour:
 
    	`0 * * * *  cd /home/pi/epever-upower-tracer && ./logtracerstats.py > /dev/null`
    
 
 Grafana Dashboard
 --------------------
-Some very basic knowledge of InfluxDB and Grafana is assumed here.
+Some very basic knowledge of InfluxDB and Grafana is assumed here. Please read the documentation for Grafana and Influx to make sure you understand how things fit together. In essense, InfluxDB stores values take out of the controller by the Loggers, and Grafana queries the InfluxDB to display these values in a format you choose over time.
 
 ![Img](grafana/AC_DC_SolarDashboard.png)
 The [grafana/](grafana/) folder contains the dashboard(s) to monitor realtime and historical solar charging data.
+The latest one is the [AC_DC_SolarDashboard.json](grafana/AC_DC_SolarDashboard.json) which includes the queries for the SDM230 AC meter.
 
 ## Grafana/InfluxDB installation
 
