@@ -75,7 +75,7 @@ By default these scripts write the output into the console (as well as the datab
 
 Grafana Dashboard
 --------------------
-Some very basic knowledge of InfluxDB and Grafana is assumed here. Please read the documentation for Grafana and Influx to make sure you understand how things fit together. In essense, InfluxDB stores values take out of the controller by the Loggers, and Grafana queries the InfluxDB to display these values in a format you choose over time.
+Some very basic knowledge of InfluxDB and Grafana is assumed here. Please read the documentation for Grafana and Influx to make sure you understand how things fit together. In essense, InfluxDB stores values taken out of the controller by the Loggers, and Grafana queries the InfluxDB to display these historical values in a format you choose. If you logger is ran every minute - then expect the graphs being up to a minute out of date.
 
 ![Img](grafana/AC_DC_SolarDashboard.png)
 The [grafana/](grafana/) folder contains the dashboard(s) to monitor realtime and historical solar charging data.
