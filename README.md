@@ -67,6 +67,11 @@ By default these scripts write the output into the console (as well as the datab
 
 	`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
 
+6. if you need the statistical values (such as the energy accumulated/generated today, over last month, year and in total) you should add another logger into cron, and this logger does not have to run every minute. For example, here we have the Statistics logger running every hour:
+
+   	`0 * * * *  cd /home/pi/epever-upower-tracer && ./logtracerstats.py > /dev/null`
+   
+
 Grafana Dashboard
 --------------------
 Some very basic knowledge of InfluxDB and Grafana is assumed here.
