@@ -5,7 +5,9 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 ![Typical EPever Tracer setup](epsolars-docs/epever-tracer.webp)
 
-**EPSolar UPower** [hybrid inverters](https://www.epever.com/product/upower-1000-5000w-hybrid-inverter-charger/) are the more recent addition to EPSOLAR family. They are devices combining MPPT chargers and inverters, and they are great at what they do especially in a semi-off-grid situation where AC power is unreliable. However, it is difficult to get them monitored if you have a Linux machine as they are still uncommon and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
+**EPSolar UPower** [hybrid inverters](https://www.epever.com/product/upower-1000-5000w-hybrid-inverter-charger/) are the more recent addition to EPSOLAR family. They are devices combining MPPT chargers and inverters, and they are great at what they do especially in a semi-off-grid situation where AC power is unreliable. However, it is difficult to get them monitored if you have a Linux machine as they are still uncommon and the protocol is not publicly available.
+
+Out of my communication with EPSolar I managed to obtain [the list of registers](epsolars-docs/Upower-communication-protocol-20190411.xlsx) and develop a UPower Python module for monitoring UPower devices.
 
 ![UPower Series](epsolars-docs/upower-front.png)
 
@@ -30,12 +32,14 @@ So, your first step is to install the Exar Linux driver. Run `uname -r` command 
 Before compiling be sure to install the linux headers with
 `sudo apt-get install raspberrypi-kernel-headers`
 
-After installing the headers be sure to do `make` and `sudo make install`.
+After installing the headers - do `make` and `sudo make install` in the respective driver directory.
 The resulting `xr_usb_serial_common.ko` driver file will be moved to `/lib/modules/YOUR_LINUX_KERNEL_VERSION/tty/serial`.
 
 Reboot and enjoy!
 
 If all goes well you should see `ttyXRUSB0` when listing `ls -la /dev/ttyXR*`
+
+If you have more than one Exar USB-RS485 cable plugged in, you will see multiple `ttyXRUSB*` devices. Make sure you set the right device for your EPever in the configuration. The default is `/dev/ttyXRUSB0`.
 
 Device communications protocols
 ---------------------
@@ -75,15 +79,15 @@ By default these scripts write the output into the console (as well as the datab
 
 	`* * * * *  cd /home/pi/epever-upower-tracer && python3 logtracer.py > /dev/null`
 
-4. you can add another line if you want it every half a minute:
+4. unfortunately, cron does not understand seconds, however you can add another line if you want it ran every half a minute:
 
 	`* * * * *  cd /home/pi/epever-upower-tracer && sleep 30 && python logtracer.py > /dev/null`
 
-6. if you need the statistical values (such as the energy accumulated/generated today, over last month, year and in total) you should add another logger into cron, and this logger DOES NOT have to run every minute. For example, here we have the Statistics logger running every hour:
+6. if you need the statistical values, such as the energy accumulated/generated today, over last month, year and in total, you must add another logger into cron. This logger DOES NOT have to run every minute. For example, here we have the Statistics logger running every half an hour:
 
-   	`0 * * * *  cd /home/pi/epever-upower-tracer && ./logtracerstats.py > /dev/null`
+   	`0,30 * * * *  cd /home/pi/epever-upower-tracer && ./logtracerstats.py > /dev/null`
 
-If your logger is set to run every minute - then expect the graphs being up to a minute out of date. Work out your required update period for yourself and update crontab as necessary.
+If your logger is set to run every minute - then expect the relevant graphs being up to a minute out of date. Work out your required update period for yourself and update crontab as necessary.
    
 
 Configuration
@@ -140,10 +144,10 @@ Additional scripts
 * `getTracerSettings.py` queries settings of the Tracer AN and displays all current voltage settings
 * `setTracerSettings.py` will rewrite Tracer AN/BN voltages (to support LiFePO4 batteries for example).
 
-Current settings in the script are for 12V LiFePO4 (300Ah), however the script can be easily changed to set values for 24V and also other types of batteries.
+Current settings in the script are for 12V LiFePO4 160Ah battery, however the script can be easily modified to set values for 24V and also other types of batteries.
 There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script.
 
-See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository with the settings from Victron.
+See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository with the default settings from Victron.
 
 See the comments in the script itself show how to choose the battery parameters. For instance,
 
@@ -162,8 +166,9 @@ Tracer with Eastron SDM230
 
 # SDM230 support
 
-[Eastron SDM230](https://www.eastroneurope.com/images/uploads/products/manuals/SDM230_Sereis_Manual.pdf) is a simple meter that measure AC if you have an external inverter.
+[Eastron SDM230](https://www.eastroneurope.com/images/uploads/products/manuals/SDM230_Sereis_Manual.pdf) is a simple meter that measures AC consumption if you have an external inverter. Connect it between the inverter and the load, and you can have another data stream from your AC devices under the same dashboard.
+
 The [sdm239/](sdm230/) directory contains scripts to query the device.
 
-`logsdmtracer` - is the script that queries both Epever Tracer and the SDM 230 and records into InfluxDB
-It adds the Inverter values such as IVvolt, IVwatt and IVison (=1 if the meter is on) into the same `solar` measurement.
+`logsdmtracer.py` - is the script that queries both Epever Tracer and the SDM 230 and records into InfluxDB
+It adds another measurement `acpower` with the Inverter values such as `IVvolt`, `IVamps`, `IVwatt` and `IVison` (=1 if the meter is on).
