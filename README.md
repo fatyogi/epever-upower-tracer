@@ -1,12 +1,12 @@
 Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via RS-485
 ===================================================
 
-**EPSolar Tracer** AN/BN devices have been around for a while so this is just another attempt to establish a good monitoring package.
+**EPSolar Tracer** AN/BN devices have been around for a while so this is just another attempt to establish a good monitoring package. This project provides a comprehensive package to configure (set voltages) and query the controller, as well as to display current and statistical values in a timeline using Grafana.
 
 **EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
 
 ## Requirements
-- Python 3  (UPower scripts are still running 2.7 as I had no chance to test on UPower device recently)
+- Python 3 (note: UPower scripts are still running 2.7 as I had no chance to test on UPower device recently)
 - Influx DB and its Python 3 modules (use pip3 to install)
 - Grafana - latest, whatever is availabe in your Raspbian
 - To communicate with the devices you will need [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
@@ -105,12 +105,31 @@ When you add InfluxDB as a Data Source. Influx DB should be set up with the foll
 
 At this point you can also import SolarDashboard from [grafana/](grafana/) folder.
 
-Use "solar" dataset to import the values from when setting up the console.
+Use `solar` measurement to import the values from when setting up the console for the current data.
+The following values are available in the `solar` measurement when building a Grafana query:
+
+* Generation: voltage, amperage and power - `PVvolt`, `PVamps`, `PVwatt`
+* Consumption: voltage, amperage and power - `DCvolt`, `DCamps`, `DCwatt`
+* Battery: `BAvolt`, `BAamps`, `BAwatt` respectively
+* Additional battery parameters: `BAtemp` (if the thermometer is connected), `BAperc` percentage of charge, `BAstat` battery status, `BAcur` battery current (could be positive or negative, depending what prevails - generation or consumption)
+
+Use `solar_stats` measurement for the statistical values. Once you have your Statistical logger running, you will see this additional measurement in your InfluxDB. 
+
+These are the values you can select from `solar_stats`, when you build your Grafana query:
+
+* `DCkwh2d` - DC power consumed today
+* `DCkwhTT` - DC power consumed in ToTal
+* `DCkwhTY` - DC power consumed This Year
+* `DCkwhTm` - DC power consumed This Month
+* `PVkwh2d` - Solar power generated today
+* `PVkwhTT` - Solar power generated in ToTal
+* `PVkwhTY` - Solar power generated This Year
+* `PVkwhTm` - Solar power generated This Month
 
 Additional scripts
 ------------------
-* `getTracerSettings.py` queries settings of the Tracer AN and displays all current voltages
-* `setTracerSettings.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
+* `getTracerSettings.py` queries settings of the Tracer AN and displays all current voltage settings
+* `setTracerSettings.py` will rewrite Tracer AN/BN voltages (to support LiFePO4 batteries for example).
 
 Current settings in the script are for 12V LiFePO4 (300Ah), however the script can be easily changed to set values for 24V and also other types of batteries.
 There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script.
