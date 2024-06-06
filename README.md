@@ -112,14 +112,18 @@ Additional scripts
 * `getTracerSettings.py` queries settings of the Tracer AN and displays all current voltages
 * `setTracerSettings.py` will rewrite Tracer AN/BN voltages to support LiFePO4 batteries.
 
-Current settings in the script are for 24V LiFePO4 (300Ah), however the script can be easily changed to set values for 12V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
+Current settings in the script are for 12V LiFePO4 (300Ah), however the script can be easily changed to set values for 24V and also other types of batteries. There is a pre-filled array for LiFePO4 and a Lead-Acid flooded battery in the script. See the comments on how to choose it.
 
 See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository
 For example,
 
-	`up.setBatterySettings(batteryLiFePO4, 300, 12)`
+	`tracer.setBatterySettings(batteryLiFePO4, 300, 24)`
 
-will set your battery to 300Ah, 12V LiFePO4
+will set your battery to 300Ah 24V LiFePO4, and
+
+	`tracer.setBatterySettings(batteryLeadAcid, 200, 12)`
+
+will set it to 200Ah 12V Lead-Acid battery
 
 * `ivctl.py` may be used to switch the UPower's internal inverter off/on for the night
 
