@@ -21,11 +21,11 @@ Out of my communication with EPSolar I managed to obtain [the list of registers]
 Make sure you install the Linux driver for Exar USB UART first
 --------------------------------------------------------------
 
-Here it is assumed that you are using the original [Epever CC-USB-RS485-150U PC Communication Cable](https://www.epever.com/product/150u-accessories-communication-cable/), which is requires a [Maxlinear Exar Linux driver](https://www.maxlinear.com/support/design-tools/software-drivers) to work. For other USB-RS485 cables/adaptors refer to their manuals as to what kind of driver do you need.
+Here it is assumed that you are using the original [Epever CC-USB-RS485-150U PC Communication Cable](https://www.epever.com/product/150u-accessories-communication-cable/), which requires a [Maxlinear Exar Linux driver](https://www.maxlinear.com/support/design-tools/software-drivers) to work. For other USB-RS485 cables/adaptors refer to their manuals as to what kind of driver do you need.
 
 ![Epever CC-USB-RS485-150U PC Communication Cable](epsolars-docs/epever-cable.webp)
 
-So, your first step is to install the Exar Linux driver. Run `uname -r` command to find out which Linux kernel version you are running.
+So, your first step is to install the Exar driver. Run `uname -r` command to find out which Linux kernel version you are under.
 * [xr_usb_serial_common-1a](xr_usb_serial_common-1a/) directory contains the makefile and instructions that will compile properly on Rasbian OS with Linux kernels up to v3.5.
 * [xr_usb_serial_common-1a-linux-3.6+](xr_usb_serial_common-1a-linux-3.6+/) directory has the drive for Linux kernels v3.6 and over.
 
