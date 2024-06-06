@@ -117,11 +117,11 @@ Current settings in the script are for 12V LiFePO4 (300Ah), however the script c
 See [Battery voltage settings](epsolars-docs/LiFePO4-Settings.xlsx) in this repository
 For example,
 
-	`tracer.setBatterySettings(batteryLiFePO4, 300, 24)`
+	tracer.setBatterySettings(batteryLiFePO4, 300, 24)
 
 will set your battery to 300Ah 24V LiFePO4, and
 
-	`tracer.setBatterySettings(batteryLeadAcid, 200, 12)`
+	tracer.setBatterySettings(batteryLeadAcid, 200, 12)
 
 will set it to 200Ah 12V Lead-Acid battery
 
