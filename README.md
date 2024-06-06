@@ -3,7 +3,11 @@ Monitoring EPsolar UPower and Tracer devices from Raspberry Pi with Python via R
 
 **EPSolar Tracer** AN/BN devices have been around for a while so this is just another attempt to establish a good monitoring package. This project provides a comprehensive package to configure (set voltages) and query the controller, as well as to display current and statistical values in a timeline using Grafana.
 
-**EPSolar UPower** hybrid inverters are great at what they do, however it is difficult to get them monitored if you have a Linux machine as they are still new and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
+![Typical EPever Tracer setup](epsolars-docs/epever-tracer.webp)
+
+**EPSolar UPower** [hybrid inverters](https://www.epever.com/product/upower-1000-5000w-hybrid-inverter-charger/) are the more recent addition to EPSOLAR family. They are devices combining MPPT chargers and inverters, and they are great at what they do especially in a semi-off-grid situation where AC power is unreliable. However, it is difficult to get them monitored if you have a Linux machine as they are still uncommon and the protocol is not publicly available. Out of my communication with EPSolar I managed to obtain the list of registers and develop a UPower Python module.
+
+![UPower Series](epsolars-docs/upower-front.png)
 
 ## Requirements
 - Python 3 (note: UPower scripts are still running 2.7 as I had no chance to test on UPower device recently)
