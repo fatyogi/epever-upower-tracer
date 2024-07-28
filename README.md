@@ -41,8 +41,14 @@ If all goes well you should see `ttyXRUSB0` when listing `ls -la /dev/ttyXR*`
 
 If you have more than one Exar USB-RS485 cable plugged in, you will see multiple `ttyXRUSB*` devices. Make sure you set the right device for your EPever in the configuration. The default is `/dev/ttyXRUSB0`.
 
+Other USB-Serial adapters
+-------------------------
+Please note, this project is designed to use ONLY the official [Epever CC-USB-RS485-150U Serial USB adapter](https://www.epever.com/product/150u-accessories-communication-cable/). The `xr_usb_serial` driver that comes with this project WILL NOT support any other adapter, you will need to find and install the driver suitable for your adapter yourself.
+
+For instance, I had multiple enquiries from people using QinHeng USB adapter. I suggest talking to @bkuschak who managed to get QinHeng adaptor working by altering the code of the Exar driver provided in this project. Apparently the QinHeng uses another byte order. He might be able to share the altered code for the driver suitable for QinHeng. Alternatively, you can buy the Epever Exar adapter from the link above, or just search for "CC-USB-RS485-150U" on AliExpress.
+
 Device communications protocols
----------------------
+-------------------------------
 * [Protocol for Epsolar Tracer](epsolar-docs/1733_modbus_protocol.pdf) in this repository
 
 * [Protocol for UPower charger/inverters](epsolars-docs/Upower-communication-protocol-20190411.xlsx) in this repository
