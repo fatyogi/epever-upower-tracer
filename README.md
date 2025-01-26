@@ -18,8 +18,33 @@ Out of my communication with EPSolar I managed to obtain [the list of registers]
 - To communicate with the devices you will need [Minimal Modbus](https://minimalmodbus.readthedocs.io/en/stable/) module for Python
 - SDM230 device is read using [nmakel/sdm_modbus](https://github.com/nmakel/sdm_modbus)
 
-Make sure you install the Linux driver for Exar USB UART first
+
+Common USB-Serial adapters
+-------------------------
+Please note, this project was originally developed to use the official [Epever CC-USB-RS485-150U Serial USB adapter](https://www.epever.com/product/150u-accessories-communication-cable/) which used the Exar chip. The Exar adapter will show the following on ```lsusb``` output:
+
+```
+$ lsusb
+Bus 001 Device 004: ID 04e2:1411 Exar Corp.
+```
+
+After that, I had multiple enquiries from people using a QinHeng USB adapter. Apparently, Qinheng is the new chip used in the latest version of Epever CC-USB-RS485-150U adapter. If you have this kind of adapter - it **should work out of the box**, no driver compilation is required. However, you will need to find out its device name under `/dev/tty*` and add it into the configuration:
+
+1. Unplug the adapter
+2. Run ```ls -1 /dev/tty* | tee devs.txt```
+3. See the output (it is also saved in `devs.txt` at this point)
+4. Plug in the adapter and run the command again: `ls -1 /dev/tty*`
+
+You will see another, new device in the output. The aforementioned Qinheng adapter may come up as something like ```/dev/ttyACM0``` or similar. Enter this device into the configuration, which for Tracer series is in [InfluxConf.py](InfluxConf.py):
+
+```
+# device configuration
+TRACER_PORT="/dev/ttyACM0"
+```
+
+Installing Linux driver for the original Exar USB UART adapter
 --------------------------------------------------------------
+***As above - if you have the new Qinheng-based USB-Serial adapter - skip this section altogether.***
 
 Here it is assumed that you are using the original [Epever CC-USB-RS485-150U PC Communication Cable](https://www.epever.com/product/150u-accessories-communication-cable/), which requires a [Maxlinear Exar Linux driver](https://www.maxlinear.com/support/design-tools/software-drivers) to work. For other USB-RS485 cables/adaptors refer to their manuals as to what kind of driver do you need.
 
@@ -41,13 +66,6 @@ If all goes well you should see `/dev/ttyXRUSB0` when listing `ls -la /dev/ttyXR
 
 If you have more than one Exar USB-RS485 cable plugged in, you will see multiple `ttyXRUSB*` devices. Make sure you set the right device for your EPever in the configuration. The default is `/dev/ttyXRUSB0`.
 
-Other USB-Serial adapters
--------------------------
-Please note, this project is designed to use ONLY the official [Epever CC-USB-RS485-150U Serial USB adapter](https://www.epever.com/product/150u-accessories-communication-cable/). The `xr_usb_serial` driver that comes with this project WILL NOT support any other adapter, you will need to find and install the driver suitable for your adapter yourself.
-
-For instance, I had multiple enquiries from people using QinHeng USB adapter. I suggest talking to @bkuschak who managed to get QinHeng adaptor working by altering the code of the Exar driver provided in this project. Apparently the QinHeng uses another byte order. He might be able to share the altered code for the driver suitable for QinHeng.
-
-Alternatively, you can buy the Epever Exar adapter from the link above, or just search for "CC-USB-RS485-150U" on AliExpress. Their cost averages under $10 USD.
 
 Device communications protocols
 -------------------------------
